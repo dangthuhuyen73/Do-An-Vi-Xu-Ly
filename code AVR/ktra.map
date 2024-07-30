@@ -1,0 +1,23 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+adc_out                                                           0x019C       4
+dienap                                                            0x01A0       4
+chuc                                                              0x01A4       4
+dvi                                                               0x01A8       4
+a                                                                 0x01AC       4
+b                                                                 0x01B0       4
+nhietdo                                                           0x01B4       4
+k                                                                 0x01B8       4
+rx_buffer                                                         0x01BC       8
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+index                                                             R4,R5        2
+thoigian0                                                         R6,R7        2
+thoigian1                                                         R8,R9        2

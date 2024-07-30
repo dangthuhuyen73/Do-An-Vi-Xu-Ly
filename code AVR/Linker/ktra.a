@@ -1,0 +1,905 @@
+;/*****************************************************
+;This program was produced by the
+;CodeWizardAVR V2.05.0 Professional
+;Automatic Program Generator
+;© Copyright 1998-2010 Pavel Haiduc, HP InfoTech s.r.l.
+;http://www.hpinfotech.com
+;
+;Project : Bai Thi Cuoi Ki
+;mssv    : N21DCVT040
+;Date    : 23/12/2023
+;Author  : Dang Thu Huyen
+;Company : ptit
+;Comments:
+;
+;
+;Chip type               : ATmega16
+;Program type            : Application
+;AVR Core Clock frequency: 8.000000 MHz
+;Memory model            : Small
+;External RAM size       : 0
+;Data Stack size         : 256
+;*****************************************************/
+;//khai bao thu vien
+;#include <mega16.h>
+;PCODE: $00000000 VOL: 0
+	#ifndef __SLEEP_DEFINED__
+;PCODE: $00000001 VOL: 0
+	#define __SLEEP_DEFINED__
+;PCODE: $00000002 VOL: 0
+	.EQU __se_bit=0x40
+;PCODE: $00000003 VOL: 0
+	.EQU __sm_mask=0xB0
+;PCODE: $00000004 VOL: 0
+	.EQU __sm_powerdown=0x20
+;PCODE: $00000005 VOL: 0
+	.EQU __sm_powersave=0x30
+;PCODE: $00000006 VOL: 0
+	.EQU __sm_standby=0xA0
+;PCODE: $00000007 VOL: 0
+	.EQU __sm_ext_standby=0xB0
+;PCODE: $00000008 VOL: 0
+	.EQU __sm_adc_noise_red=0x10
+;PCODE: $00000009 VOL: 0
+	.SET power_ctrl_reg=mcucr
+;PCODE: $0000000A VOL: 0
+	#endif
+;PCODE: $0000000B VOL: 0
+;PCODE: $0000000C VOL: 0
+;#include <stdio.h>
+;#include <string.h>
+;#include <delay.h>
+;#define LED PORTB
+;#define SW PIND.2
+;#define ADC_VREF_TYPE 0x00
+;// khai bao bien
+;unsigned long adc_out=0;
+;unsigned long dienap;
+;unsigned long chuc,dvi, a, b;
+;unsigned long nhietdo, k;
+;//khai bao timemer
+;#define RX_BUFFER_SIZE 8
+;char rx_buffer[RX_BUFFER_SIZE];
+;unsigned int index=0;
+;unsigned int thoigian0 = 240, thoigian1 = 189;
+;
+;//ham doc adc
+;unsigned int read_adc(unsigned char adc_input)
+; 0000 002C {
+
+	.CSEG
+;PCODE: $0000000D VOL: 0
+;PCODE: $0000000E VOL: 0
+; 0000 002D ADMUX=adc_input | (ADC_VREF_TYPE & 0xff);
+;	adc_input -> Y+0
+;PCODE: $0000000F VOL: 0
+;PCODE: $00000010 VOL: 0
+;PCODE: $00000011 VOL: 0
+; 0000 002E // Delay needed for the stabilization of the ADC input voltage
+; 0000 002F delay_us(10);
+;PCODE: $00000012 VOL: 0
+; 0000 0030 // Start the AD conversion
+; 0000 0031 ADCSRA|=0x40;
+;PCODE: $00000013 VOL: 0
+;PCODE: $00000014 VOL: 0
+; 0000 0032 // Wait for the AD conversion to complete
+; 0000 0033 while ((ADCSRA & 0x10)==0);
+;PCODE: $00000015 VOL: 0
+;PCODE: $00000016 VOL: 0
+;PCODE: $00000017 VOL: 0
+;PCODE: $00000018 VOL: 0
+;PCODE: $00000019 VOL: 0
+;PCODE: $0000001A VOL: 0
+; 0000 0034 ADCSRA|=0x10;
+;PCODE: $0000001B VOL: 0
+;PCODE: $0000001C VOL: 0
+; 0000 0035 return ADCW;
+;PCODE: $0000001D VOL: 0
+;PCODE: $0000001E VOL: 0
+;PCODE: $0000001F VOL: 0
+; 0000 0036 }
+;PCODE: $00000020 VOL: 0
+;
+;
+;// chuong trinh con phat mot chuoi ki tu
+;void uart_char_send(unsigned char chr){
+; 0000 003A void uart_char_send(unsigned char chr){
+;PCODE: $00000021 VOL: 0
+;PCODE: $00000022 VOL: 0
+; 0000 003B while(!(UCSRA&(1<<UDRE))) {};
+;	chr -> Y+0
+;PCODE: $00000023 VOL: 0
+;PCODE: $00000024 VOL: 0
+;PCODE: $00000025 VOL: 0
+;PCODE: $00000026 VOL: 0
+;PCODE: $00000027 VOL: 0
+;PCODE: $00000028 VOL: 0
+; 0000 003C //ktra khi nao udre bang 1 de thanh ghi trong de bo du lieu vao
+; 0000 003D    UDR=chr;  //khi udre =1 cho phep du lieu vào
+;PCODE: $00000029 VOL: 0
+;PCODE: $0000002A VOL: 0
+; 0000 003E    }
+;PCODE: $0000002B VOL: 0
+;PCODE: $0000002C VOL: 0
+;PCODE: $0000002D VOL: 0
+;//cho nhieu ki tu
+;void uart_string_send(unsigned char *txt){
+; 0000 0040 void uart_string_send(unsigned char *txt){
+;PCODE: $0000002E VOL: 0
+;PCODE: $0000002F VOL: 0
+; 0000 0041    unsigned char n,i;
+; 0000 0042    n=strlen(txt);
+;PCODE: $00000030 VOL: 0
+;PCODE: $00000031 VOL: 0
+;	*txt -> Y+2
+;	n -> R17
+;	i -> R16
+;PCODE: $00000032 VOL: 0
+;PCODE: $00000033 VOL: 0
+;PCODE: $00000034 VOL: 0
+;PCODE: $00000035 VOL: 0
+; 0000 0043    //dem có bn ki tu n so luong
+; 0000 0044    for(i=0;i<n;i++){
+;PCODE: $00000036 VOL: 0
+;PCODE: $00000037 VOL: 0
+;PCODE: $00000038 VOL: 0
+;PCODE: $00000039 VOL: 0
+;PCODE: $0000003A VOL: 0
+;PCODE: $0000003B VOL: 0
+;PCODE: $0000003C VOL: 0
+;PCODE: $0000003D VOL: 0
+;PCODE: $0000003E VOL: 0
+; 0000 0045    uart_char_send(txt[i]);}
+;PCODE: $0000003F VOL: 0
+;PCODE: $00000040 VOL: 0
+;PCODE: $00000041 VOL: 0
+;PCODE: $00000042 VOL: 0
+;PCODE: $00000043 VOL: 0
+;PCODE: $00000044 VOL: 0
+;PCODE: $00000045 VOL: 0
+;PCODE: $00000046 VOL: 0
+;PCODE: $00000047 VOL: 0
+;PCODE: $00000048 VOL: 0
+; 0000 0046 }
+;PCODE: $00000049 VOL: 0
+;PCODE: $0000004A VOL: 0
+;PCODE: $0000004B VOL: 0
+;PCODE: $0000004C VOL: 0
+;PCODE: $0000004D VOL: 0
+;PCODE: $0000004E VOL: 0
+;PCODE: $0000004F VOL: 0
+;
+;//ngat uart
+;interrupt[USART_RXC] void usart_rx_isr(void) {
+; 0000 0049 interrupt[12] void usart_rx_isr(void) {
+;PCODE: $00000050 VOL: 0
+;PCODE: $00000051 VOL: 0
+; 0000 004A     char data;
+; 0000 004B     data = UDR;
+;PCODE: $00000052 VOL: 0
+;	data -> R17
+;PCODE: $00000053 VOL: 0
+;PCODE: $00000054 VOL: 0
+; 0000 004C     // bat den
+; 0000 004D     if (data == 'l') {
+;PCODE: $00000055 VOL: 0
+;PCODE: $00000056 VOL: 0
+;PCODE: $00000057 VOL: 0
+; 0000 004E         PORTB.0 = 1;
+;PCODE: $00000058 VOL: 0
+;PCODE: $00000059 VOL: 0
+; 0000 004F     }
+; 0000 0050     if (data == 'm') {
+;PCODE: $0000005A VOL: 0
+;PCODE: $0000005B VOL: 0
+;PCODE: $0000005C VOL: 0
+;PCODE: $0000005D VOL: 0
+; 0000 0051         PORTB.1 = 1;
+;PCODE: $0000005E VOL: 0
+;PCODE: $0000005F VOL: 0
+; 0000 0052     }
+; 0000 0053     if (data == 'n') {
+;PCODE: $00000060 VOL: 0
+;PCODE: $00000061 VOL: 0
+;PCODE: $00000062 VOL: 0
+;PCODE: $00000063 VOL: 0
+; 0000 0054         PORTB.2 = 1;
+;PCODE: $00000064 VOL: 0
+;PCODE: $00000065 VOL: 0
+; 0000 0055     }
+; 0000 0056     if (data == 'o') {
+;PCODE: $00000066 VOL: 0
+;PCODE: $00000067 VOL: 0
+;PCODE: $00000068 VOL: 0
+;PCODE: $00000069 VOL: 0
+; 0000 0057         PORTB.3 = 1;
+;PCODE: $0000006A VOL: 0
+;PCODE: $0000006B VOL: 0
+; 0000 0058     }
+; 0000 0059     if (data == 'u') {
+;PCODE: $0000006C VOL: 0
+;PCODE: $0000006D VOL: 0
+;PCODE: $0000006E VOL: 0
+;PCODE: $0000006F VOL: 0
+; 0000 005A         PORTB.4 = 1;
+;PCODE: $00000070 VOL: 0
+;PCODE: $00000071 VOL: 0
+; 0000 005B     }
+; 0000 005C     if (data == 'i') {
+;PCODE: $00000072 VOL: 0
+;PCODE: $00000073 VOL: 0
+;PCODE: $00000074 VOL: 0
+;PCODE: $00000075 VOL: 0
+; 0000 005D         PORTB.5 = 1;
+;PCODE: $00000076 VOL: 0
+;PCODE: $00000077 VOL: 0
+; 0000 005E     }
+; 0000 005F     if (data == 'v') {
+;PCODE: $00000078 VOL: 0
+;PCODE: $00000079 VOL: 0
+;PCODE: $0000007A VOL: 0
+;PCODE: $0000007B VOL: 0
+; 0000 0060         PORTB.6 = 1;
+;PCODE: $0000007C VOL: 0
+;PCODE: $0000007D VOL: 0
+; 0000 0061     }
+; 0000 0062     if (data == 'x') {
+;PCODE: $0000007E VOL: 0
+;PCODE: $0000007F VOL: 0
+;PCODE: $00000080 VOL: 0
+;PCODE: $00000081 VOL: 0
+; 0000 0063         PORTB.7 = 1;
+;PCODE: $00000082 VOL: 0
+;PCODE: $00000083 VOL: 0
+; 0000 0064     }
+; 0000 0065     // bat quat
+; 0000 0066     if (data == 'y'){
+;PCODE: $00000084 VOL: 0
+;PCODE: $00000085 VOL: 0
+;PCODE: $00000086 VOL: 0
+;PCODE: $00000087 VOL: 0
+; 0000 0067         PORTC.1=1;
+;PCODE: $00000088 VOL: 0
+;PCODE: $00000089 VOL: 0
+; 0000 0068     }
+; 0000 0069     // tat den
+; 0000 006A     if (data == 'a') {
+;PCODE: $0000008A VOL: 0
+;PCODE: $0000008B VOL: 0
+;PCODE: $0000008C VOL: 0
+;PCODE: $0000008D VOL: 0
+; 0000 006B         PORTB.0 = 0;
+;PCODE: $0000008E VOL: 0
+;PCODE: $0000008F VOL: 0
+; 0000 006C     }
+; 0000 006D     if (data == 'b') {
+;PCODE: $00000090 VOL: 0
+;PCODE: $00000091 VOL: 0
+;PCODE: $00000092 VOL: 0
+;PCODE: $00000093 VOL: 0
+; 0000 006E         PORTB.1 = 0;
+;PCODE: $00000094 VOL: 0
+;PCODE: $00000095 VOL: 0
+; 0000 006F     }
+; 0000 0070     if (data == 'c') {
+;PCODE: $00000096 VOL: 0
+;PCODE: $00000097 VOL: 0
+;PCODE: $00000098 VOL: 0
+;PCODE: $00000099 VOL: 0
+; 0000 0071         PORTB.2 = 0;
+;PCODE: $0000009A VOL: 0
+;PCODE: $0000009B VOL: 0
+; 0000 0072     }
+; 0000 0073     if (data == 'd') {
+;PCODE: $0000009C VOL: 0
+;PCODE: $0000009D VOL: 0
+;PCODE: $0000009E VOL: 0
+;PCODE: $0000009F VOL: 0
+; 0000 0074         PORTB.3 = 0;
+;PCODE: $000000A0 VOL: 0
+;PCODE: $000000A1 VOL: 0
+; 0000 0075     }
+; 0000 0076     if (data == 'e') {
+;PCODE: $000000A2 VOL: 0
+;PCODE: $000000A3 VOL: 0
+;PCODE: $000000A4 VOL: 0
+;PCODE: $000000A5 VOL: 0
+; 0000 0077         PORTB.4 = 0;
+;PCODE: $000000A6 VOL: 0
+;PCODE: $000000A7 VOL: 0
+; 0000 0078     }
+; 0000 0079     if (data == 'f') {
+;PCODE: $000000A8 VOL: 0
+;PCODE: $000000A9 VOL: 0
+;PCODE: $000000AA VOL: 0
+;PCODE: $000000AB VOL: 0
+; 0000 007A         PORTB.5 = 0;
+;PCODE: $000000AC VOL: 0
+;PCODE: $000000AD VOL: 0
+; 0000 007B     }
+; 0000 007C     if (data == 'g') {
+;PCODE: $000000AE VOL: 0
+;PCODE: $000000AF VOL: 0
+;PCODE: $000000B0 VOL: 0
+;PCODE: $000000B1 VOL: 0
+; 0000 007D         PORTB.6 = 0;
+;PCODE: $000000B2 VOL: 0
+;PCODE: $000000B3 VOL: 0
+; 0000 007E     }
+; 0000 007F     if (data == 'h') {
+;PCODE: $000000B4 VOL: 0
+;PCODE: $000000B5 VOL: 0
+;PCODE: $000000B6 VOL: 0
+;PCODE: $000000B7 VOL: 0
+; 0000 0080         PORTB.7 = 0;
+;PCODE: $000000B8 VOL: 0
+;PCODE: $000000B9 VOL: 0
+; 0000 0081     }
+; 0000 0082     // tat Quat
+; 0000 0083     if (data == 'j'){
+;PCODE: $000000BA VOL: 0
+;PCODE: $000000BB VOL: 0
+;PCODE: $000000BC VOL: 0
+;PCODE: $000000BD VOL: 0
+; 0000 0084         PORTC.1=0;
+;PCODE: $000000BE VOL: 0
+;PCODE: $000000BF VOL: 0
+; 0000 0085     }
+; 0000 0086     //timer
+; 0000 0087     if ((data >= 'A' && data <= 'Z') || (data >= '0' && data <= '9')){
+;PCODE: $000000C0 VOL: 0
+;PCODE: $000000C1 VOL: 0
+;PCODE: $000000C2 VOL: 0
+;PCODE: $000000C3 VOL: 0
+;PCODE: $000000C4 VOL: 0
+;PCODE: $000000C5 VOL: 0
+;PCODE: $000000C6 VOL: 0
+;PCODE: $000000C7 VOL: 0
+;PCODE: $000000C8 VOL: 0
+;PCODE: $000000C9 VOL: 0
+;PCODE: $000000CA VOL: 0
+;PCODE: $000000CB VOL: 0
+;PCODE: $000000CC VOL: 0
+;PCODE: $000000CD VOL: 0
+;PCODE: $000000CE VOL: 0
+;PCODE: $000000CF VOL: 0
+;PCODE: $000000D0 VOL: 0
+;PCODE: $000000D1 VOL: 0
+;PCODE: $000000D2 VOL: 0
+; 0000 0088     rx_buffer[index++] = data;
+;PCODE: $000000D3 VOL: 0
+;PCODE: $000000D4 VOL: 0
+;PCODE: $000000D5 VOL: 0
+;PCODE: $000000D6 VOL: 0
+;PCODE: $000000D7 VOL: 0
+;PCODE: $000000D8 VOL: 0
+; 0000 0089     }
+; 0000 008A     if (index==4){
+;PCODE: $000000D9 VOL: 0
+;PCODE: $000000DA VOL: 0
+;PCODE: $000000DB VOL: 0
+;PCODE: $000000DC VOL: 0
+; 0000 008B         if(strcmp(rx_buffer, "FOBD") == 0){
+;PCODE: $000000DD VOL: 0
+;PCODE: $000000DE VOL: 0
+;PCODE: $000000DF VOL: 0
+;PCODE: $000000E0 VOL: 0
+;PCODE: $000000E1 VOL: 0
+;PCODE: $000000E2 VOL: 0
+;PCODE: $000000E3 VOL: 0
+;PCODE: $000000E4 VOL: 0
+; 0000 008C               thoigian0 = 240;
+;PCODE: $000000E5 VOL: 0
+;PCODE: $000000E6 VOL: 0
+; 0000 008D               thoigian1 = 189;
+;PCODE: $000000E7 VOL: 0
+;PCODE: $000000E8 VOL: 0
+; 0000 008E         }
+; 0000 008F         if(strcmp(rx_buffer, "E17B") == 0){
+;PCODE: $000000E9 VOL: 0
+;PCODE: $000000EA VOL: 0
+;PCODE: $000000EB VOL: 0
+;PCODE: $000000EC VOL: 0
+;PCODE: $000000ED VOL: 0
+;PCODE: $000000EE VOL: 0
+;PCODE: $000000EF VOL: 0
+;PCODE: $000000F0 VOL: 0
+;PCODE: $000000F1 VOL: 0
+; 0000 0090               thoigian0 = 225;
+;PCODE: $000000F2 VOL: 0
+;PCODE: $000000F3 VOL: 0
+; 0000 0091               thoigian1 = 123;
+;PCODE: $000000F4 VOL: 0
+;PCODE: $000000F5 VOL: 0
+; 0000 0092         }
+; 0000 0093         if(strcmp(rx_buffer, "D239") == 0){
+;PCODE: $000000F6 VOL: 0
+;PCODE: $000000F7 VOL: 0
+;PCODE: $000000F8 VOL: 0
+;PCODE: $000000F9 VOL: 0
+;PCODE: $000000FA VOL: 0
+;PCODE: $000000FB VOL: 0
+;PCODE: $000000FC VOL: 0
+;PCODE: $000000FD VOL: 0
+;PCODE: $000000FE VOL: 0
+; 0000 0094               thoigian0 = 210;
+;PCODE: $000000FF VOL: 0
+;PCODE: $00000100 VOL: 0
+; 0000 0095               thoigian1 = 57;
+;PCODE: $00000101 VOL: 0
+;PCODE: $00000102 VOL: 0
+; 0000 0096         }
+; 0000 0097         if(strcmp(rx_buffer, "C2F6") == 0){
+;PCODE: $00000103 VOL: 0
+;PCODE: $00000104 VOL: 0
+;PCODE: $00000105 VOL: 0
+;PCODE: $00000106 VOL: 0
+;PCODE: $00000107 VOL: 0
+;PCODE: $00000108 VOL: 0
+;PCODE: $00000109 VOL: 0
+;PCODE: $0000010A VOL: 0
+;PCODE: $0000010B VOL: 0
+; 0000 0098               thoigian0 = 194;
+;PCODE: $0000010C VOL: 0
+;PCODE: $0000010D VOL: 0
+; 0000 0099               thoigian1 = 246;
+;PCODE: $0000010E VOL: 0
+;PCODE: $0000010F VOL: 0
+; 0000 009A         }
+; 0000 009B         if(strcmp(rx_buffer, "B3B4") == 0){
+;PCODE: $00000110 VOL: 0
+;PCODE: $00000111 VOL: 0
+;PCODE: $00000112 VOL: 0
+;PCODE: $00000113 VOL: 0
+;PCODE: $00000114 VOL: 0
+;PCODE: $00000115 VOL: 0
+;PCODE: $00000116 VOL: 0
+;PCODE: $00000117 VOL: 0
+;PCODE: $00000118 VOL: 0
+; 0000 009C               thoigian0 = 179;
+;PCODE: $00000119 VOL: 0
+;PCODE: $0000011A VOL: 0
+; 0000 009D               thoigian1 = 180;
+;PCODE: $0000011B VOL: 0
+;PCODE: $0000011C VOL: 0
+; 0000 009E         }
+; 0000 009F         if(strcmp(rx_buffer, "A472") == 0){
+;PCODE: $0000011D VOL: 0
+;PCODE: $0000011E VOL: 0
+;PCODE: $0000011F VOL: 0
+;PCODE: $00000120 VOL: 0
+;PCODE: $00000121 VOL: 0
+;PCODE: $00000122 VOL: 0
+;PCODE: $00000123 VOL: 0
+;PCODE: $00000124 VOL: 0
+;PCODE: $00000125 VOL: 0
+; 0000 00A0               thoigian0 = 164;
+;PCODE: $00000126 VOL: 0
+;PCODE: $00000127 VOL: 0
+; 0000 00A1               thoigian1 = 114;
+;PCODE: $00000128 VOL: 0
+;PCODE: $00000129 VOL: 0
+; 0000 00A2         }
+; 0000 00A3         if(strcmp(rx_buffer, "9530") == 0){
+;PCODE: $0000012A VOL: 0
+;PCODE: $0000012B VOL: 0
+;PCODE: $0000012C VOL: 0
+;PCODE: $0000012D VOL: 0
+;PCODE: $0000012E VOL: 0
+;PCODE: $0000012F VOL: 0
+;PCODE: $00000130 VOL: 0
+;PCODE: $00000131 VOL: 0
+;PCODE: $00000132 VOL: 0
+; 0000 00A4               thoigian0 = 149;
+;PCODE: $00000133 VOL: 0
+;PCODE: $00000134 VOL: 0
+; 0000 00A5               thoigian1 = 48;
+;PCODE: $00000135 VOL: 0
+;PCODE: $00000136 VOL: 0
+; 0000 00A6         }
+; 0000 00A7         if(strcmp(rx_buffer, "85ED") == 0){
+;PCODE: $00000137 VOL: 0
+;PCODE: $00000138 VOL: 0
+;PCODE: $00000139 VOL: 0
+;PCODE: $0000013A VOL: 0
+;PCODE: $0000013B VOL: 0
+;PCODE: $0000013C VOL: 0
+;PCODE: $0000013D VOL: 0
+;PCODE: $0000013E VOL: 0
+;PCODE: $0000013F VOL: 0
+; 0000 00A8               thoigian0 = 133;
+;PCODE: $00000140 VOL: 0
+;PCODE: $00000141 VOL: 0
+; 0000 00A9               thoigian1 = 237;
+;PCODE: $00000142 VOL: 0
+;PCODE: $00000143 VOL: 0
+; 0000 00AA         }
+; 0000 00AB         if(strcmp(rx_buffer, "76AB") == 0){
+;PCODE: $00000144 VOL: 0
+;PCODE: $00000145 VOL: 0
+;PCODE: $00000146 VOL: 0
+;PCODE: $00000147 VOL: 0
+;PCODE: $00000148 VOL: 0
+;PCODE: $00000149 VOL: 0
+;PCODE: $0000014A VOL: 0
+;PCODE: $0000014B VOL: 0
+;PCODE: $0000014C VOL: 0
+; 0000 00AC               thoigian0 = 118;
+;PCODE: $0000014D VOL: 0
+;PCODE: $0000014E VOL: 0
+; 0000 00AD               thoigian1 = 171;
+;PCODE: $0000014F VOL: 0
+;PCODE: $00000150 VOL: 0
+; 0000 00AE         }
+; 0000 00AF         if(strcmp(rx_buffer, "6769") == 0){
+;PCODE: $00000151 VOL: 0
+;PCODE: $00000152 VOL: 0
+;PCODE: $00000153 VOL: 0
+;PCODE: $00000154 VOL: 0
+;PCODE: $00000155 VOL: 0
+;PCODE: $00000156 VOL: 0
+;PCODE: $00000157 VOL: 0
+;PCODE: $00000158 VOL: 0
+;PCODE: $00000159 VOL: 0
+; 0000 00B0               thoigian0 = 103;
+;PCODE: $0000015A VOL: 0
+;PCODE: $0000015B VOL: 0
+; 0000 00B1               thoigian1 = 105;
+;PCODE: $0000015C VOL: 0
+;PCODE: $0000015D VOL: 0
+; 0000 00B2         }
+; 0000 00B3         index=0;
+;PCODE: $0000015E VOL: 0
+;PCODE: $0000015F VOL: 0
+; 0000 00B4     }
+; 0000 00B5 }
+;PCODE: $00000160 VOL: 0
+;PCODE: $00000161 VOL: 0
+;PCODE: $00000162 VOL: 0
+;PCODE: $00000163 VOL: 0
+;PCODE: $00000164 VOL: 0
+
+	.DSEG
+_0x4B:
+	.BYTE 0x32
+;
+;//NGAT TIME
+;interrupt [TIM1_OVF] void timer1_ovf_isr(void){
+; 0000 00B8 interrupt [9] void timer1_ovf_isr(void){
+
+	.CSEG
+;PCODE: $00000165 VOL: 0
+;PCODE: $00000166 VOL: 0
+; 0000 00B9    TCNT1H=thoigian0;
+;PCODE: $00000167 VOL: 0
+;PCODE: $00000168 VOL: 0
+; 0000 00BA    TCNT1L=thoigian1;
+;PCODE: $00000169 VOL: 0
+;PCODE: $0000016A VOL: 0
+; 0000 00BB    PORTC.0=~PORTC.0;
+;PCODE: $0000016B VOL: 0
+;PCODE: $0000016C VOL: 0
+;PCODE: $0000016D VOL: 0
+;PCODE: $0000016E VOL: 0
+;PCODE: $0000016F VOL: 0
+;PCODE: $00000170 VOL: 0
+;PCODE: $00000171 VOL: 0
+;PCODE: $00000172 VOL: 0
+;PCODE: $00000173 VOL: 0
+;PCODE: $00000174 VOL: 0
+; 0000 00BC }
+;PCODE: $00000175 VOL: 0
+;PCODE: $00000176 VOL: 0
+;PCODE: $00000177 VOL: 0
+;
+;interrupt [EXT_INT0] void ext_int0_isr(void) {
+; 0000 00BE interrupt [2] void ext_int0_isr(void) {
+;PCODE: $00000178 VOL: 0
+;PCODE: $00000179 VOL: 0
+; 0000 00BF   a= k/10;
+;PCODE: $0000017A VOL: 0
+;PCODE: $0000017B VOL: 0
+;PCODE: $0000017C VOL: 0
+;PCODE: $0000017D VOL: 0
+; 0000 00C0   b= k%10;
+;PCODE: $0000017E VOL: 0
+;PCODE: $0000017F VOL: 0
+;PCODE: $00000180 VOL: 0
+;PCODE: $00000181 VOL: 0
+; 0000 00C1   k++;
+;PCODE: $00000182 VOL: 0
+;PCODE: $00000183 VOL: 0
+;PCODE: $00000184 VOL: 0
+;PCODE: $00000185 VOL: 0
+; 0000 00C2   uart_string_send("Counter: ");
+;PCODE: $00000186 VOL: 0
+;PCODE: $00000187 VOL: 0
+;PCODE: $00000188 VOL: 0
+;PCODE: $00000189 VOL: 0
+; 0000 00C3   uart_char_send(a+0x30);
+;PCODE: $0000018A VOL: 0
+;PCODE: $0000018B VOL: 0
+;PCODE: $0000018C VOL: 0
+;PCODE: $0000018D VOL: 0
+; 0000 00C4   uart_char_send(b+0x30);
+;PCODE: $0000018E VOL: 0
+;PCODE: $0000018F VOL: 0
+;PCODE: $00000190 VOL: 0
+;PCODE: $00000191 VOL: 0
+; 0000 00C5   uart_char_send(10);
+;PCODE: $00000192 VOL: 0
+;PCODE: $00000193 VOL: 0
+;PCODE: $00000194 VOL: 0
+; 0000 00C6   uart_char_send(13);
+;PCODE: $00000195 VOL: 0
+;PCODE: $00000196 VOL: 0
+;PCODE: $00000197 VOL: 0
+; 0000 00C7 }
+;PCODE: $00000198 VOL: 0
+;PCODE: $00000199 VOL: 0
+;PCODE: $0000019A VOL: 0
+
+	.DSEG
+_0x57:
+	.BYTE 0xA
+;void main(void)
+; 0000 00C9 {
+
+	.CSEG
+;PCODE: $0000019B VOL: 0
+; 0000 00CA // Declare your local variables here
+; 0000 00CB 
+; 0000 00CC // Input/Output Ports initialization
+; 0000 00CD // Port A initialization
+; 0000 00CE // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 00CF // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 00D0 PORTA=0x00;
+;PCODE: $0000019C VOL: 0
+;PCODE: $0000019D VOL: 0
+; 0000 00D1 DDRA=0xff;
+;PCODE: $0000019E VOL: 0
+;PCODE: $0000019F VOL: 0
+; 0000 00D2 
+; 0000 00D3 // Port B initialization
+; 0000 00D4 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 00D5 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 00D6 PORTB=0x00;
+;PCODE: $000001A0 VOL: 0
+;PCODE: $000001A1 VOL: 0
+; 0000 00D7 DDRB=0xff;
+;PCODE: $000001A2 VOL: 0
+;PCODE: $000001A3 VOL: 0
+; 0000 00D8 
+; 0000 00D9 // Port C initialization
+; 0000 00DA // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 00DB // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 00DC PORTC=0x00;
+;PCODE: $000001A4 VOL: 0
+;PCODE: $000001A5 VOL: 0
+; 0000 00DD DDRC=0xff;
+;PCODE: $000001A6 VOL: 0
+;PCODE: $000001A7 VOL: 0
+; 0000 00DE 
+; 0000 00DF // Port D initialization
+; 0000 00E0 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 00E1 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 00E2 PORTD=0x00;
+;PCODE: $000001A8 VOL: 0
+;PCODE: $000001A9 VOL: 0
+; 0000 00E3 DDRD=0x02;
+;PCODE: $000001AA VOL: 0
+;PCODE: $000001AB VOL: 0
+; 0000 00E4 
+; 0000 00E5 
+; 0000 00E6 //khoi tao timer/counter 0
+; 0000 00E7 TCCR0=0x00;
+;PCODE: $000001AC VOL: 0
+;PCODE: $000001AD VOL: 0
+; 0000 00E8 TCNT0=0x00;
+;PCODE: $000001AE VOL: 0
+;PCODE: $000001AF VOL: 0
+; 0000 00E9 OCR0=0x00;
+;PCODE: $000001B0 VOL: 0
+;PCODE: $000001B1 VOL: 0
+; 0000 00EA 
+; 0000 00EB //khoi tao timer/counter 1
+; 0000 00EC TCCR1A=0x00;
+;PCODE: $000001B2 VOL: 0
+;PCODE: $000001B3 VOL: 0
+; 0000 00ED //CHOP NHAY
+; 0000 00EE TCCR1B=0X05;
+;PCODE: $000001B4 VOL: 0
+;PCODE: $000001B5 VOL: 0
+; 0000 00EF TIMSK=0X04;
+;PCODE: $000001B6 VOL: 0
+;PCODE: $000001B7 VOL: 0
+; 0000 00F0 
+; 0000 00F1 ICR1H=0x00;
+;PCODE: $000001B8 VOL: 0
+;PCODE: $000001B9 VOL: 0
+; 0000 00F2 ICR1L=0x00;
+;PCODE: $000001BA VOL: 0
+;PCODE: $000001BB VOL: 0
+; 0000 00F3 OCR1AH=0x00;
+;PCODE: $000001BC VOL: 0
+;PCODE: $000001BD VOL: 0
+; 0000 00F4 OCR1AL=0x00;
+;PCODE: $000001BE VOL: 0
+;PCODE: $000001BF VOL: 0
+; 0000 00F5 OCR1BH=0x00;
+;PCODE: $000001C0 VOL: 0
+;PCODE: $000001C1 VOL: 0
+; 0000 00F6 OCR1BL=0x00;
+;PCODE: $000001C2 VOL: 0
+;PCODE: $000001C3 VOL: 0
+; 0000 00F7 
+; 0000 00F8 //cai dat tg diem bd cho bo dem
+; 0000 00F9 TCNT1H=thoigian0;
+;PCODE: $000001C4 VOL: 0
+;PCODE: $000001C5 VOL: 0
+; 0000 00FA TCNT1L=thoigian1;
+;PCODE: $000001C6 VOL: 0
+;PCODE: $000001C7 VOL: 0
+; 0000 00FB 
+; 0000 00FC // Timer/Counter 2 initialization
+; 0000 00FD // Clock source: System Clock
+; 0000 00FE // Clock value: Timer2 Stopped
+; 0000 00FF // Mode: Normal top=0xFF
+; 0000 0100 // OC2 output: Disconnected
+; 0000 0101 ASSR=0x00;
+;PCODE: $000001C8 VOL: 0
+;PCODE: $000001C9 VOL: 0
+; 0000 0102 TCCR2=0x00;
+;PCODE: $000001CA VOL: 0
+;PCODE: $000001CB VOL: 0
+; 0000 0103 TCNT2=0x00;
+;PCODE: $000001CC VOL: 0
+;PCODE: $000001CD VOL: 0
+; 0000 0104 OCR2=0x00;
+;PCODE: $000001CE VOL: 0
+;PCODE: $000001CF VOL: 0
+; 0000 0105 
+; 0000 0106 GICR|=0x40;
+;PCODE: $000001D0 VOL: 0
+;PCODE: $000001D1 VOL: 0
+;PCODE: $000001D2 VOL: 0
+; 0000 0107 MCUCR=0x02;
+;PCODE: $000001D3 VOL: 0
+;PCODE: $000001D4 VOL: 0
+; 0000 0108 MCUCSR=0x00;
+;PCODE: $000001D5 VOL: 0
+;PCODE: $000001D6 VOL: 0
+; 0000 0109 GIFR=0x40;
+;PCODE: $000001D7 VOL: 0
+;PCODE: $000001D8 VOL: 0
+; 0000 010A // External Interrupt(s) initialization
+; 0000 010B // INT0: Off
+; 0000 010C // INT1: Off
+; 0000 010D // INT2: Off
+; 0000 010E MCUCR=0x00;
+;PCODE: $000001D9 VOL: 0
+;PCODE: $000001DA VOL: 0
+; 0000 010F MCUCSR=0x00;
+;PCODE: $000001DB VOL: 0
+;PCODE: $000001DC VOL: 0
+; 0000 0110 
+; 0000 0111 //khoi tao adc
+; 0000 0112 ADMUX=ADC_VREF_TYPE & 0xff;
+;PCODE: $000001DD VOL: 0
+;PCODE: $000001DE VOL: 0
+; 0000 0113 ADCSRA=0x83;
+;PCODE: $000001DF VOL: 0
+;PCODE: $000001E0 VOL: 0
+; 0000 0114 
+; 0000 0115 // USART initialization
+; 0000 0116 // Communication Parameters: 8 Data, 1 Stop, No Parity
+; 0000 0117 // USART Receiver: On
+; 0000 0118 // USART Transmitter: On
+; 0000 0119 // USART Mode: Asynchronous
+; 0000 011A // USART Baud Rate: 9600
+; 0000 011B //khoi tao usart
+; 0000 011C UCSRA=0x00;
+;PCODE: $000001E1 VOL: 0
+;PCODE: $000001E2 VOL: 0
+; 0000 011D UCSRB=0x98;
+;PCODE: $000001E3 VOL: 0
+;PCODE: $000001E4 VOL: 0
+; 0000 011E UCSRC=0x86;
+;PCODE: $000001E5 VOL: 0
+;PCODE: $000001E6 VOL: 0
+; 0000 011F UBRRH=0x00;
+;PCODE: $000001E7 VOL: 0
+;PCODE: $000001E8 VOL: 0
+; 0000 0120 UBRRL=0x33;
+;PCODE: $000001E9 VOL: 0
+;PCODE: $000001EA VOL: 0
+; 0000 0121 
+; 0000 0122 //
+; 0000 0123 //// Analog Comparator initialization
+; 0000 0124 //// Analog Comparator: Off
+; 0000 0125 //// Analog Comparator Input Capture by Timer/Counter 1: Off
+; 0000 0126 ACSR=0x80;
+;PCODE: $000001EB VOL: 0
+;PCODE: $000001EC VOL: 0
+; 0000 0127 SFIOR=0x00;
+;PCODE: $000001ED VOL: 0
+;PCODE: $000001EE VOL: 0
+; 0000 0128 
+; 0000 0129 SPCR=0x00;
+;PCODE: $000001EF VOL: 0
+;PCODE: $000001F0 VOL: 0
+; 0000 012A 
+; 0000 012B TWCR=0x00;
+;PCODE: $000001F1 VOL: 0
+;PCODE: $000001F2 VOL: 0
+; 0000 012C 
+; 0000 012D //bat ngat toan cuc
+; 0000 012E #asm("sei")
+;PCODE: $000001F3 VOL: 0
+	sei
+;PCODE: $000001F4 VOL: 0
+; 0000 012F while (1)
+;PCODE: $000001F5 VOL: 0
+; 0000 0130       {
+; 0000 0131       //nhiet do
+; 0000 0132       adc_out=read_adc(0);
+;PCODE: $000001F6 VOL: 0
+;PCODE: $000001F7 VOL: 0
+;PCODE: $000001F8 VOL: 0
+;PCODE: $000001F9 VOL: 0
+;PCODE: $000001FA VOL: 0
+; 0000 0133       dienap=adc_out*5000/1023;
+;PCODE: $000001FB VOL: 0
+;PCODE: $000001FC VOL: 0
+;PCODE: $000001FD VOL: 0
+;PCODE: $000001FE VOL: 0
+;PCODE: $000001FF VOL: 0
+;PCODE: $00000200 VOL: 0
+;PCODE: $00000201 VOL: 0
+; 0000 0134       nhietdo=dienap/10;
+;PCODE: $00000202 VOL: 0
+;PCODE: $00000203 VOL: 0
+;PCODE: $00000204 VOL: 0
+;PCODE: $00000205 VOL: 0
+; 0000 0135 
+; 0000 0136       chuc=nhietdo/10;
+;PCODE: $00000206 VOL: 0
+;PCODE: $00000207 VOL: 0
+;PCODE: $00000208 VOL: 0
+;PCODE: $00000209 VOL: 0
+; 0000 0137       dvi=nhietdo%10;
+;PCODE: $0000020A VOL: 0
+;PCODE: $0000020B VOL: 0
+;PCODE: $0000020C VOL: 0
+;PCODE: $0000020D VOL: 0
+; 0000 0138       uart_char_send(chuc+0x30);
+;PCODE: $0000020E VOL: 0
+;PCODE: $0000020F VOL: 0
+;PCODE: $00000210 VOL: 0
+;PCODE: $00000211 VOL: 0
+; 0000 0139       uart_char_send(dvi+0x30);
+;PCODE: $00000212 VOL: 0
+;PCODE: $00000213 VOL: 0
+;PCODE: $00000214 VOL: 0
+;PCODE: $00000215 VOL: 0
+; 0000 013A       uart_char_send(10);
+;PCODE: $00000216 VOL: 0
+;PCODE: $00000217 VOL: 0
+;PCODE: $00000218 VOL: 0
+; 0000 013B       uart_char_send(13);
+;PCODE: $00000219 VOL: 0
+;PCODE: $0000021A VOL: 0
+;PCODE: $0000021B VOL: 0
+; 0000 013C      //xuong hang
+; 0000 013D       delay_ms(200);
+;PCODE: $0000021C VOL: 0
+;PCODE: $0000021D VOL: 0
+;PCODE: $0000021E VOL: 0
+; 0000 013E       }
+;PCODE: $0000021F VOL: 0
+;PCODE: $00000220 VOL: 0
+; 0000 013F 
+; 0000 0140 }
+;PCODE: $00000221 VOL: 0
+;PCODE: $00000222 VOL: 0
+;PCODE: $00000223 VOL: 0

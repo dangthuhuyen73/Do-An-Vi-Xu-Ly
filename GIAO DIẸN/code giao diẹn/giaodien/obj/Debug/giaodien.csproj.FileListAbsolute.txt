@@ -1,0 +1,22 @@
+D:\GIAO DIEN\giaodien\giaodien\bin\Debug\giaodien.exe.config
+D:\GIAO DIEN\giaodien\giaodien\bin\Debug\giaodien.exe
+D:\GIAO DIEN\giaodien\giaodien\bin\Debug\giaodien.pdb
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.csproj.AssemblyReference.cache
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.csproj.SuggestedBindingRedirects.cache
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.Form1.resources
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.Properties.Resources.resources
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.csproj.GenerateResource.cache
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.csproj.CoreCompileInputs.cache
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.exe
+D:\GIAO DIEN\giaodien\giaodien\obj\Debug\giaodien.pdb
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\bin\Debug\giaodien.exe.config
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\bin\Debug\giaodien.exe
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\bin\Debug\giaodien.pdb
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.csproj.AssemblyReference.cache
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.csproj.SuggestedBindingRedirects.cache
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.Form1.resources
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.Properties.Resources.resources
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.csproj.GenerateResource.cache
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.csproj.CoreCompileInputs.cache
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.exe
+D:\DANG THU HUYEN_N21DCVT040_D21CQVT01-N\GIAO DIẸN\code giao diẹn\giaodien\obj\Debug\giaodien.pdb
